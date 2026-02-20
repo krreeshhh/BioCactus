@@ -13,12 +13,13 @@ const quizRoutes = require('./routes/quiz.routes');
 const progressRoutes = require('./routes/progress.routes');
 const chatRoutes = require('./routes/chat.routes');
 const { languageMiddleware } = require('./middleware/language.middleware');
-
+const compression = require('compression');
 const path = require('path');
 
 const app = express();
 
 // Middleware
+app.use(compression()); // Enable Gzip compression
 app.use(cors());
 app.use(express.json());
 app.use(languageMiddleware);
@@ -33,7 +34,17 @@ app.use('/api/chat', chatRoutes);
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../dist')));
+    // Set caching headers for static assets
+    app.use(express.static(path.join(__dirname, '../dist'), {
+        maxAge: '1y',
+        etag: true,
+        setHeaders: (res, path) => {
+            if (path.endsWith('.html')) {
+                // Don't cache HTML files long-term to allow for updates
+                res.setHeader('Cache-Control', 'public, max-age=0');
+            }
+        }
+    }));
 
     app.get('*', (req, res) => {
         if (!req.path.startsWith('/api')) {
