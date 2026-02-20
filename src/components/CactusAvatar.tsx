@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import cactusImg from "@/assets/cactus-avatar.png";
+import cactusImg from "@/assets/Logo.png";
 import { FaSmile, FaQuestionCircle, FaStar, FaDumbbell, FaSadTear } from "react-icons/fa";
 
 type Mood = "happy" | "thinking" | "celebrating" | "encouraging" | "sad";

@@ -6,8 +6,10 @@ import CactusAvatar from "@/components/CactusAvatar";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { quizQuestions } from "@/lib/data";
+import { useTranslation } from "@/lib/i18n";
 
 const Quiz = () => {
+  const { t } = useTranslation();
   const { topicId, lessonIndex } = useParams<{ topicId: string, lessonIndex: string }>();
   const [currentQ, setCurrentQ] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -31,7 +33,7 @@ const Quiz = () => {
   });
 
   if (isLoading) {
-    return <div className="p-8 text-center">Generating your AI quiz...</div>;
+    return <div className="p-8 text-center">{t('common.generating_quiz')}</div>;
   }
 
   const questions = quizData?.data?.questions || [];
@@ -40,8 +42,8 @@ const Quiz = () => {
   if (!question) {
     return (
       <div className="p-8 text-center">
-        <CactusAvatar mood="sad" message="Quiz not found!" size="lg" />
-        <Link to="/dashboard" className="text-primary mt-4 inline-block">← Back to Dashboard</Link>
+        <CactusAvatar mood="sad" message={t('common.quiz_not_found')} size="lg" />
+        <Link to="/dashboard" className="text-primary mt-4 inline-block">← {t('common.back_to_dashboard')}</Link>
       </div>
     );
   }
@@ -84,16 +86,16 @@ const Quiz = () => {
             <CactusAvatar
               size="lg"
               mood={hasPassed ? "celebrating" : "sad"}
-              message={hasPassed ? "PERFECT!" : "Not quite there..."}
+              message={hasPassed ? t('common.perfect') : t('common.not_quite_there')}
             />
 
             <h1 className={`text-3xl font-bold mt-8 mb-2 ${hasPassed ? 'text-primary' : 'text-foreground'}`}>
-              {hasPassed ? 'Level Cleared!' : 'Keep Practicing!'}
+              {hasPassed ? t('common.level_cleared') : t('common.keep_practicing')}
             </h1>
 
             <p className="text-muted-foreground mb-6">
-              You scored <span className={`font-bold ${hasPassed ? 'text-primary' : 'text-destructive'}`}>{submissionResult.score}/{submissionResult.total}</span>
-              {!hasPassed && " (Need 50% to Pass)"}
+              {t('common.score_msg')} <span className={`font-bold ${hasPassed ? 'text-primary' : 'text-destructive'}`}>{submissionResult.score}/{submissionResult.total}</span>
+              {!hasPassed && ` ${t('common.need_pass')}`}
             </p>
 
             <motion.div
@@ -116,14 +118,14 @@ const Quiz = () => {
                 to={`/course/${topicId}`}
                 className="w-full px-6 py-4 rounded-xl border-2 border-border/50 text-sm font-bold text-foreground hover:bg-secondary transition-all flex items-center justify-center gap-2"
               >
-                <ArrowLeft className="w-4 h-4" /> Exit to Path
+                <ArrowLeft className="w-4 h-4" /> {t('common.exit_to_path')}
               </Link>
 
               <button
                 onClick={() => window.location.reload()}
                 className={`w-full px-6 py-4 rounded-xl text-sm font-bold text-white transition-all shadow-xl flex items-center justify-center gap-2 ${hasPassed ? 'gradient-primary shadow-primary/20 hover:scale-105' : 'bg-white/10 border-2 border-primary/50 text-primary hover:bg-primary/5'}`}
               >
-                {hasPassed ? 'Clear & Review' : 'Retry Level'}
+                {hasPassed ? t('common.clear_review') : t('common.retry_level')}
               </button>
             </div>
           </motion.div>
@@ -145,13 +147,13 @@ const Quiz = () => {
           to={`/course/${topicId}`}
           className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-all mb-8 group"
         >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Path
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> {t('common.back_to_path')}
         </Link>
 
         {/* Progress */}
         <div className="flex items-center gap-4 mb-10">
           <div className="flex flex-col">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Progress</span>
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">{t('common.progress')}</span>
             <span className="text-sm font-bold text-foreground">
               {currentQ + 1} <span className="text-muted-foreground font-medium">/ {questions.length}</span>
             </span>
@@ -171,7 +173,7 @@ const Quiz = () => {
           <motion.div
             key={currentQ}
             initial={{ opacity: 0, scale: 0.98, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, y: -10 }}
             className="flex-1"
           >
@@ -179,7 +181,7 @@ const Quiz = () => {
               {/* Corner Accent */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-16 -mt-16 transition-all group-hover:bg-primary/10" />
 
-              <span className="text-[10px] uppercase tracking-[0.2em] text-primary font-bold mb-4 block">Question</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-primary font-bold mb-4 block">{t('common.question')}</span>
               <h2 className="text-2xl font-bold text-foreground leading-tight">{question.question}</h2>
             </div>
 
@@ -265,7 +267,7 @@ const Quiz = () => {
                     />
                     <div>
                       <p className={`text-sm font-semibold ${question.options[selected!] === question.correctAnswer ? "text-primary" : "text-destructive"}`}>
-                        {question.options[selected!] === question.correctAnswer ? "Correct!" : "Not quite!"}
+                        {question.options[selected!] === question.correctAnswer ? t('common.correct') : t('common.not_quite')}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">{question.explanation}</p>
                     </div>
@@ -282,7 +284,7 @@ const Quiz = () => {
                 disabled={mutation.isPending}
                 className="w-full py-3.5 rounded-xl gradient-primary text-sm font-bold text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50"
               >
-                {mutation.isPending ? "Submitting..." : (currentQ + 1 >= questions.length ? "See Results" : "Next Question →")}
+                {mutation.isPending ? t('common.submitting') : (currentQ + 1 >= questions.length ? t('common.see_results') : `${t('common.next_question')} →`)}
               </motion.button>
             )}
           </motion.div>

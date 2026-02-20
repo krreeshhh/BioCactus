@@ -11,6 +11,7 @@ router.get('/:topicId', verifyToken, async (req, res) => {
     try {
         const { topicId } = req.params;
         const { uid } = req.user;
+        const { language, languageName } = req;
 
         // Fetch User Data first
         const userRef = db.collection('users').doc(uid);
@@ -44,7 +45,25 @@ router.get('/:topicId', verifyToken, async (req, res) => {
             topics: userData.interestTopic || userData.topics
         };
 
-        const lessonContent = await generateLesson(topicData.title, userPrefs);
+        // Cache-check: translatedLessons
+        let lessonContent;
+        const cacheId = `${topicId}_${language}`;
+        const cacheRef = db.collection('translatedLessons').doc(cacheId);
+        const cacheDoc = await cacheRef.get();
+
+        if (cacheDoc.exists) {
+            lessonContent = cacheDoc.data().content;
+        } else {
+            // Generate using Gemini in target language
+            lessonContent = await generateLesson(topicData.title, userPrefs, languageName);
+            // Save to cache
+            await cacheRef.set({
+                topicId,
+                language,
+                content: lessonContent,
+                createdAt: new Date().toISOString()
+            });
+        }
 
         // Save/Update progress
         const progressRef = db.collection('progress').doc(`${uid}_${topicId}`);
@@ -87,6 +106,7 @@ router.get('/:topicId', verifyToken, async (req, res) => {
 
         res.status(200).json({
             success: true,
+            language,
             data: {
                 content: lessonContent,
                 topic: {

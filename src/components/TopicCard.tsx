@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { CheckCircle2, Lock, ArrowUpRight } from "lucide-react";
 import type { Topic } from "@/lib/data";
+import { useTranslation } from "@/lib/i18n";
 
 interface TopicCardProps {
   topic: Topic;
@@ -9,6 +10,7 @@ interface TopicCardProps {
 }
 
 const TopicCard = ({ topic, index }: TopicCardProps) => {
+  const { t } = useTranslation();
   const progress = topic.lessons > 0 ? (topic.completedLessons / topic.lessons) * 100 : 0;
   const isCompleted = progress === 100;
   const isLocked = false;
@@ -34,7 +36,7 @@ const TopicCard = ({ topic, index }: TopicCardProps) => {
               <div className="flex flex-col items-end gap-2">
                 {isCompleted ? (
                   <div className="px-2.5 py-1 rounded-full bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-wider border border-primary/20">
-                    Completed
+                    {t('common.complete')}
                   </div>
                 ) : (
                   <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
@@ -55,7 +57,7 @@ const TopicCard = ({ topic, index }: TopicCardProps) => {
           <div className="relative z-10 mt-auto">
             {/* Progress */}
             <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-muted-foreground/60 mb-3">
-              <span>{topic.completedLessons} / {topic.lessons} Lessons</span>
+              <span>{topic.completedLessons} / {topic.lessons} {t('common.lessons')}</span>
               <span className="text-xp font-black">{topic.xp} XP</span>
             </div>
             <div className="h-2 rounded-full bg-white/5 overflow-hidden border border-white/5 p-[1px]">

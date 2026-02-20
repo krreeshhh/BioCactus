@@ -2,7 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface SidebarContextType {
     isCompact: boolean;
+    isMobileOpen: boolean;
     toggleCompact: () => void;
+    setMobileOpen: (open: boolean) => void;
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -12,6 +14,7 @@ export const SidebarProvider = ({ children }: { children: React.ReactNode }) => 
         const saved = localStorage.getItem("sidebar_compact");
         return saved === "true";
     });
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
 
     const toggleCompact = () => {
         setIsCompact((prev) => {
@@ -22,7 +25,7 @@ export const SidebarProvider = ({ children }: { children: React.ReactNode }) => 
     };
 
     return (
-        <SidebarContext.Provider value={{ isCompact, toggleCompact }}>
+        <SidebarContext.Provider value={{ isCompact, isMobileOpen, toggleCompact, setMobileOpen: setIsMobileOpen }}>
             {children}
         </SidebarContext.Provider>
     );

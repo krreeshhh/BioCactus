@@ -1,6 +1,6 @@
 import { auth } from "./firebase";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000/api" : "/api");
 
 const fetchWithToken = async (endpoint: string, options: RequestInit = {}) => {
     if (!auth) {
@@ -16,6 +16,7 @@ const fetchWithToken = async (endpoint: string, options: RequestInit = {}) => {
         ...options.headers,
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
+        "x-language": localStorage.getItem("preferredLanguage") || "en",
     };
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -47,4 +48,13 @@ export const api = {
         body: JSON.stringify(prefs)
     }),
     getLeaderboard: () => fetchWithToken("/user/leaderboard"),
+    updateLanguage: (languageCode: string) => fetchWithToken("/user/language", {
+        method: "POST",
+        body: JSON.stringify({ languageCode })
+    }),
+    chat: (message: string, history: { role: string; content: string }[]) =>
+        fetchWithToken("/chat", {
+            method: "POST",
+            body: JSON.stringify({ message, history }),
+        }),
 };

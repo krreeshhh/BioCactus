@@ -4,7 +4,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { verifyToken } = require('../middleware/auth.middleware');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
 const SYSTEM_PROMPT = `You are BioCactus AI — the friendly, expert assistant for the BioCactus learning platform.
 
@@ -26,6 +26,7 @@ Always be encouraging — you're a learning companion, not just an information b
 // POST /api/chat
 router.post('/', verifyToken, async (req, res) => {
     const { message, history = [] } = req.body;
+    const { languageName } = req;
 
     if (!message || typeof message !== 'string') {
         return res.status(400).json({ success: false, message: 'Message is required.' });
@@ -36,11 +37,11 @@ router.post('/', verifyToken, async (req, res) => {
             history: [
                 {
                     role: 'user',
-                    parts: [{ text: SYSTEM_PROMPT }],
+                    parts: [{ text: `${SYSTEM_PROMPT}\n\nCRITICAL: Respond STRICTLY in ${languageName} using native script.` }],
                 },
                 {
                     role: 'model',
-                    parts: [{ text: "Understood! I'm BioCactus AI, ready to help with biotech questions and platform guidance. What would you like to know?" }],
+                    parts: [{ text: `Understood! I will communicate strictly in ${languageName}.` }],
                 },
                 // Inject prior conversation turns
                 ...history.map(msg => ({
@@ -60,6 +61,7 @@ router.post('/', verifyToken, async (req, res) => {
 
         res.status(200).json({
             success: true,
+            language: req.language,
             data: { reply: text },
         });
     } catch (error) {

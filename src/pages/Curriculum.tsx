@@ -15,8 +15,10 @@ import { topicIconMap } from "@/lib/data";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
+import { useTranslation } from "@/lib/i18n";
 
 const Curriculum = () => {
+    const { t } = useTranslation();
     const { data: progressData, isLoading } = useQuery({
         queryKey: ["progress"],
         queryFn: api.getProgress,
@@ -42,9 +44,9 @@ const Curriculum = () => {
             <div className="relative overflow-hidden m3-glass p-10 flex flex-col md:flex-row justify-between items-center gap-8">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] -mr-32 -mt-32" />
                 <div className="relative z-10 space-y-4 text-center md:text-left">
-                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter">Your Biotech <span className="text-primary text-glow">Curriculum</span></h1>
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter">{t('common.curriculum_title')}</h1>
                     <p className="text-muted-foreground text-lg max-w-xl">
-                        Master the fundamentals of bioinformatics and biotechnology through our structured learning path.
+                        {t('common.curriculum_desc')}
                     </p>
                 </div>
 
@@ -76,7 +78,7 @@ const Curriculum = () => {
                         </svg>
                         <div className="absolute flex flex-col items-center">
                             <span className="text-3xl font-black tracking-tighter">{Math.round(overallCompletion)}%</span>
-                            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest leading-none">Complete</span>
+                            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest leading-none">{t('common.complete')}</span>
                         </div>
                     </div>
                 </div>
@@ -139,24 +141,24 @@ const Curriculum = () => {
 
                                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                                             <div className="bg-white/5 border border-white/5 p-4 rounded-2xl">
-                                                <p className="text-[10px] font-black uppercase text-muted-foreground/40 mb-1 tracking-widest">Progress</p>
-                                                <p className="text-lg font-black">{completedCount} / {totalLessons} Lessons</p>
+                                                <p className="text-[10px] font-black uppercase text-muted-foreground/40 mb-1 tracking-widest">{t('common.progress')}</p>
+                                                <p className="text-lg font-black">{completedCount} / {totalLessons} {t('common.lessons')}</p>
                                             </div>
                                             <div className="bg-white/5 border border-white/5 p-4 rounded-2xl">
-                                                <p className="text-[10px] font-black uppercase text-muted-foreground/40 mb-1 tracking-widest">Rewards</p>
+                                                <p className="text-[10px] font-black uppercase text-muted-foreground/40 mb-1 tracking-widest">{t('common.rewards')}</p>
                                                 <div className="flex items-center gap-2">
                                                     <Zap className="w-4 h-4 text-xp" />
                                                     <p className="text-lg font-black text-xp">{topic.xp || 100} XP</p>
                                                 </div>
                                             </div>
                                             <div className="bg-white/5 border border-white/5 p-4 rounded-2xl">
-                                                <p className="text-[10px] font-black uppercase text-muted-foreground/40 mb-1 tracking-widest">Status</p>
+                                                <p className="text-[10px] font-black uppercase text-muted-foreground/40 mb-1 tracking-widest">{t('common.status')}</p>
                                                 <p className={`text-lg font-black ${progress === 100 ? "text-primary" : progress > 0 ? "text-accent" : "text-muted-foreground/60"}`}>
-                                                    {progress === 100 ? "Mastered" : progress > 0 ? "In Transit" : "Unmapped"}
+                                                    {progress === 100 ? t('common.mastered') : progress > 0 ? t('common.in_transit') : t('common.unmapped')}
                                                 </p>
                                             </div>
                                             <div className="bg-white/5 border border-white/5 p-4 rounded-2xl">
-                                                <p className="text-[10px] font-black uppercase text-muted-foreground/40 mb-1 tracking-widest">Topic Milestone</p>
+                                                <p className="text-[10px] font-black uppercase text-muted-foreground/40 mb-1 tracking-widest">{t('common.milestone')}</p>
                                                 <div className="flex items-center gap-2">
                                                     <Milestone className={`w-4 h-4 ${progress === 100 ? "text-primary" : "text-muted-foreground/20"}`} />
                                                     <p className="text-lg font-black leading-none">{topicIdx + 1}</p>
@@ -191,7 +193,7 @@ const Curriculum = () => {
                                                         }`}
                                                 >
                                                     <div className="flex justify-between items-start mb-3">
-                                                        <span className="text-[10px] font-bold text-muted-foreground/60">Module {i + 1}</span>
+                                                        <span className="text-[10px] font-bold text-muted-foreground/60">{t('common.module')} {i + 1}</span>
                                                         {isComplete ? (
                                                             <CheckCircle2 className="w-4 h-4 text-primary" />
                                                         ) : isUpcoming ? (
@@ -201,7 +203,7 @@ const Curriculum = () => {
                                                         )}
                                                     </div>
                                                     <p className={`text-xs font-bold leading-tight ${isUpcoming ? "text-foreground" : "text-muted-foreground"}`}>
-                                                        {isComplete ? "Sync Finalized" : isUpcoming ? "Ready for Sync" : "Access Encrypted"}
+                                                        {isComplete ? t('common.sync_finalized') : isUpcoming ? t('common.ready_for_sync') : t('common.access_encrypted')}
                                                     </p>
                                                 </div>
                                             );
@@ -218,12 +220,12 @@ const Curriculum = () => {
             <div className="m3-glass p-12 text-center space-y-6 relative overflow-hidden">
                 <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
                 <Trophy className="w-16 h-16 text-xp mx-auto mb-4 animate-bounce" />
-                <h2 className="text-3xl font-black tracking-tighter">Reach the Next Frontier</h2>
+                <h2 className="text-3xl font-black tracking-tighter">{t('common.next_frontier')}</h2>
                 <p className="text-muted-foreground max-w-xl mx-auto">
-                    Every lesson completed brings you closer to becoming a Bio-Architect. Complete your current path to unlock advanced genomic research modules.
+                    {t('common.frontier_desc')}
                 </p>
                 <button className="glossy-button mx-auto mt-4 px-10 py-4 text-base uppercase tracking-[0.2em]">
-                    Initiate Next Module
+                    {t('common.initiate_module')}
                 </button>
             </div>
         </div>

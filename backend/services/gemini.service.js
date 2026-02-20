@@ -4,14 +4,16 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-const generateLesson = async (topicTitle, userPrefs = {}) => {
+const generateLesson = async (topicTitle, userPrefs = {}, languageName = 'English') => {
   const { experience = 'beginner', topics = 'molecular' } = userPrefs;
   const prompt = `Explain the topic "${topicTitle}" in a way suitable for a ${experience} level student. 
     The student is specifically interested in ${topics}. 
     Keep under 250 words. Friendly and encouraging tone. 
-    Use a cactus-themed metaphor if possible.`;
+    Use a cactus-themed metaphor if possible.
+    
+    CRITICAL: Generate the response STRICTLY in ${languageName} using native script.`;
 
   try {
     const result = await model.generateContent(prompt);
@@ -19,11 +21,11 @@ const generateLesson = async (topicTitle, userPrefs = {}) => {
     return response.text();
   } catch (error) {
     console.error("Gemini Lesson Generation Failed:", error.message);
-    return `Welcome to your lesson on ${topicTitle}! As a ${experience} learner, you're about to explore the fascinating world of ${topics}. Just like a cactus stores water for the long haul, we're going to build a solid foundation of knowledge here. Stay curious and keep growing!`;
+    return `Welcome! (Note: Generation failed, fallback shown). Lesson on ${topicTitle} for ${experience} level. Language: ${languageName}`;
   }
 };
 
-const generateQuiz = async (topicTitle, userPrefs = {}) => {
+const generateQuiz = async (topicTitle, userPrefs = {}, languageName = 'English') => {
   const { experience = 'beginner' } = userPrefs;
   const prompt = `Generate exactly 5 distinct multiple-choice questions about the biotech topic: "${topicTitle}".
   Target Audience: ${experience} level student.
@@ -32,14 +34,15 @@ const generateQuiz = async (topicTitle, userPrefs = {}) => {
   1. DO NOT use placeholder text like "Option A", "Option B", etc. for options. Provide actual plausible answers.
   2. Ensure the "correctAnswer" matches one of the "options" EXACTLY.
   3. Provide a helpful "explanation" for why the answer is correct.
+  4. Generate EVERYTHING (questions, options, explanations) STRICTLY in ${languageName} using native script.
   
   Return ONLY a structured JSON array:
   [
     {
-      "question": "Clear question text?",
-      "options": ["Real Choice 1", "Real Choice 2", "Real Choice 3", "Real Choice 4"],
-      "correctAnswer": "Real Choice 1",
-      "explanation": "Scientific explanation here."
+      "question": "Question text in ${languageName}",
+      "options": ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
+      "correctAnswer": "Choice 1",
+      "explanation": "Explanation in ${languageName}"
     }
   ]`;
 
@@ -48,7 +51,6 @@ const generateQuiz = async (topicTitle, userPrefs = {}) => {
     const response = await result.response;
     const text = response.text();
 
-    // Clean up the response if it contains markdown code blocks
     const jsonMatch = text.match(/\[[\s\S]*\]/);
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]);
@@ -56,55 +58,44 @@ const generateQuiz = async (topicTitle, userPrefs = {}) => {
     return JSON.parse(text);
   } catch (error) {
     console.error("Gemini Quiz Generation Failed:", error.message);
-    return [
-      {
-        "question": `What is the primary goal of ${topicTitle || 'Biotechnology'}?`,
-        "options": ["Genetic manipulation", "Observation only", "Waste disposal", "Painting"],
-        "correctAnswer": "Genetic manipulation",
-        "explanation": "Biotechnology focuses on using living systems and organisms to develop or make products."
-      },
-      {
-        "question": "Which molecule carries genetic information?",
-        "options": ["DNA", "ATP", "Glucose", "Hemoglobin"],
-        "correctAnswer": "DNA",
-        "explanation": "DNA (Deoxyribonucleic acid) is the hereditary material in humans and almost all other organisms."
-      },
-      {
-        "question": "What does CRISPR stand for?",
-        "options": ["Clustered Regularly Interspaced Short Palindromic Repeats", "Critical Response in Species Research", "Cellular Regeneration in Synthetic Protein", "Cybernetic Research in Species"],
-        "correctAnswer": "Clustered Regularly Interspaced Short Palindromic Repeats",
-        "explanation": "CRISPR is a revolutionary gene-editing technology."
-      },
-      {
-        "question": "Which of these is a common use of biotechnology in agriculture?",
-        "options": ["Pest-resistant crops", "Manual weeding", "Coloring soil", "Cloud seeding"],
-        "correctAnswer": "Pest-resistant crops",
-        "explanation": "BT cotton and other crops are engineered to be resistant to specific pests."
-      },
-      {
-        "question": "What is 'Molecular Cloning'?",
-        "options": ["Creating copies of DNA fragments", "Cloning whole humans", "Mixing chemicals", "Cleaning lab equipment"],
-        "correctAnswer": "Creating copies of DNA fragments",
-        "explanation": "Molecular cloning is a set of experimental methods used to assemble recombinant DNA molecules."
-      }
-    ];
+    // Return empty array or localized fallback if needed
+    return [];
   }
 };
 
-const generateFeedback = async (score, total, userPrefs = {}) => {
+const generateFeedback = async (score, total, userPrefs = {}, languageName = 'English') => {
   const { experience = 'beginner' } = userPrefs;
-  const prompt = `User at ${experience} level scored ${score} out of ${total} in a biology quiz. Generate a short, friendly, and encouraging feedback message.`;
+  const prompt = `User at ${experience} level scored ${score} out of ${total} in a biology quiz. 
+  Generate a short, friendly, and encouraging feedback message.
+  
+  CRITICAL: Generate the response STRICTLY in ${languageName} using native script.`;
 
   try {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     return response.text();
   } catch (error) {
-    return `Great effort! You scored ${score}/${total}. Keep practicing to level up your ${experience} skills!`;
+    return `Great effort! ${score}/${total}. (Language fallback)`;
   }
 };
 
-const generateCurriculum = async (experience, interest) => {
+const generateCactusMessage = async (type, languageName = 'English') => {
+  const prompt = `Generate a short cactus-themed message for a ${type} scenario in a biology learning app.
+    Scenarios could be: welcoming back, encouraging after a lesson, celebrating a streak, or a fun biology fact.
+    
+    CRITICAL: Generate the response STRICTLY in ${languageName} using native script.
+    Keep it under 15 words. Friendly and cactus-like!`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text().trim();
+  } catch (error) {
+    return "Keep growing!";
+  }
+};
+
+const generateCurriculum = async (experience, interest, languageName = 'English') => {
   const prompt = `Create a personalized biology curriculum for a ${experience} level student interested in ${interest}.
   Return exactly 4 course modules.
   Each module should have: 
@@ -117,12 +108,14 @@ const generateCurriculum = async (experience, interest) => {
   - lessonsCount (integer between 5 and 10)
   - xpGoal (integer, e.g., 500)
   
+  CRITICAL: Generate titles and descriptions STRICTLY in ${languageName} using native script.
+  
   Return structured JSON format ONLY:
   [
     {
       "id": "module-slug",
-      "title": "Module Title",
-      "description": "Short description",
+      "title": "Module Title in ${languageName}",
+      "description": "Short description in ${languageName}",
       "icon": "🧬",
       "color": "from-emerald-500 to-teal-600",
       "order": 1,
@@ -135,54 +128,11 @@ const generateCurriculum = async (experience, interest) => {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    console.log("Raw Gemini Curriculum Response:", text);
     const jsonMatch = text.match(/\[[\s\S]*\]/);
     return jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(text);
   } catch (error) {
-    console.error("Gemini Curriculum Generation Failed, using fallback:", error.message);
-    // Fallback curriculum based on interests
-    return [
-      {
-        "id": "intro-bio",
-        "title": `Introduction to ${interest}`,
-        "description": `Master the fundamentals of ${interest} at a ${experience} level.`,
-        "icon": "🌿",
-        "color": "from-emerald-500 to-teal-600",
-        "order": 1,
-        "lessonsCount": 6,
-        "xpGoal": 600
-      },
-      {
-        "id": "advanced-topics",
-        "title": `Advanced ${interest}`,
-        "description": "Deep dive into complex biological systems and theories.",
-        "icon": "🧪",
-        "color": "from-blue-500 to-indigo-600",
-        "order": 2,
-        "lessonsCount": 8,
-        "xpGoal": 800
-      },
-      {
-        "id": "bio-tech-apply",
-        "title": "Applied Biotechnology",
-        "description": "Real-world applications of modern biological tools.",
-        "icon": "🔬",
-        "color": "from-purple-500 to-pink-600",
-        "order": 3,
-        "lessonsCount": 5,
-        "xpGoal": 500
-      },
-      {
-        "id": "future-horizons",
-        "title": "Future of Biology",
-        "description": "Exploring the cutting-edge research and ethics.",
-        "icon": "🚀",
-        "color": "from-orange-500 to-red-600",
-        "order": 4,
-        "lessonsCount": 7,
-        "xpGoal": 700
-      }
-    ];
+    console.error("Gemini Curriculum Generation Failed:", error.message);
+    return [];
   }
 };
 
@@ -190,5 +140,7 @@ module.exports = {
   generateLesson,
   generateQuiz,
   generateFeedback,
-  generateCurriculum
+  generateCurriculum,
+  generateCactusMessage
 };
+

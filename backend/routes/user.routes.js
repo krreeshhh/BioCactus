@@ -77,14 +77,45 @@ router.get('/leaderboard', verifyToken, async (req, res) => {
     }
 });
 
+// POST /api/user/language
+router.post('/language', verifyToken, async (req, res) => {
+    try {
+        const { uid } = req.user;
+        const { languageCode } = req.body;
+        const { SUPPORTED_LANGUAGES } = require('../middleware/language.middleware');
+
+        if (!SUPPORTED_LANGUAGES[languageCode]) {
+            return res.status(400).json({ success: false, message: 'Unsupported language code' });
+        }
+
+        const userRef = db.collection('users').doc(uid);
+        await userRef.update({
+            preferredLanguage: languageCode
+        });
+
+        res.status(200).json({
+            success: true,
+            data: { language: languageCode },
+            message: 'Language preference updated'
+        });
+    } catch (error) {
+        console.error('Update language error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error updating language preference'
+        });
+    }
+});
+
 // POST /api/user/curriculum
 router.post('/curriculum', verifyToken, async (req, res) => {
     try {
         const { uid } = req.user;
         const { experience, topics: interest } = req.body;
+        const { languageName } = req;
 
-        console.log(`Generating custom curriculum for user ${uid}...`);
-        const curriculum = await generateCurriculum(experience, interest);
+        console.log(`Generating custom curriculum for user ${uid} in ${languageName}...`);
+        const curriculum = await generateCurriculum(experience, interest, languageName);
 
         const userRef = db.collection('users').doc(uid);
         await userRef.update({

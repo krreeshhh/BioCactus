@@ -15,8 +15,10 @@ import Onboarding from "./pages/Onboarding";
 import CoursePath from "./pages/CoursePath";
 import Leaderboard from "./pages/Leaderboard";
 import Curriculum from "./pages/Curriculum";
+import ChatPage from "./pages/ChatPage";
 import AppLayout from "./components/AppLayout";
 import { AuthProvider } from "./hooks/useAuth";
+import { I18nProvider } from "./lib/i18n";
 
 
 import { PublicRoute, PrivateRoute } from "./components/AuthRoute";
@@ -26,38 +28,41 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <Routes>
-            {/* Auth restricted routes (Logged in users go to dashboard) */}
-            <Route element={<PublicRoute />}>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-            </Route>
-
-            {/* Protected routes (Requires login) */}
-            <Route element={<PrivateRoute />}>
-              <Route path="/onboarding" element={<Onboarding />} />
-              <Route element={<AppLayout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/curriculum" element={<Curriculum />} />
-                <Route path="/leaderboard" element={<Leaderboard />} />
-                <Route path="/course/:topicId" element={<CoursePath />} />
-                <Route path="/lesson/:topicId/:lessonIndex" element={<Lesson />} />
-                <Route path="/quiz/:topicId/:lessonIndex" element={<Quiz />} />
-                <Route path="/profile" element={<Profile />} />
+    <I18nProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <Routes>
+              {/* Auth restricted routes (Logged in users go to dashboard) */}
+              <Route element={<PublicRoute />}>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
               </Route>
-            </Route>
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+              {/* Protected routes (Requires login) */}
+              <Route element={<PrivateRoute />}>
+                <Route path="/onboarding" element={<Onboarding />} />
+                <Route element={<AppLayout />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/curriculum" element={<Curriculum />} />
+                  <Route path="/leaderboard" element={<Leaderboard />} />
+                  <Route path="/course/:topicId" element={<CoursePath />} />
+                  <Route path="/lesson/:topicId/:lessonIndex" element={<Lesson />} />
+                  <Route path="/quiz/:topicId/:lessonIndex" element={<Quiz />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/chat" element={<ChatPage />} />
+                </Route>
+              </Route>
+
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </I18nProvider>
   </QueryClientProvider>
 );
 

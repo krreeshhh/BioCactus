@@ -11,6 +11,7 @@ router.get('/:topicId', verifyToken, async (req, res) => {
     try {
         const { topicId } = req.params;
         const { uid } = req.user;
+        const { language, languageName } = req;
 
         // Fetch User Data
         const userRef = db.collection('users').doc(uid);
@@ -39,11 +40,31 @@ router.get('/:topicId', verifyToken, async (req, res) => {
             });
         }
 
-        const userPrefs = { experience: userData?.experience };
-        const questions = await generateQuiz(topicData.title, userPrefs);
+        // Cache-check: translatedQuizzes
+        let questions;
+        const cacheId = `${topicId}_${language}`;
+        const cacheRef = db.collection('translatedQuizzes').doc(cacheId);
+        const cacheDoc = await cacheRef.get();
+
+        if (cacheDoc.exists) {
+            questions = cacheDoc.data().quiz;
+        } else {
+            const userPrefs = { experience: userData?.experience };
+            questions = await generateQuiz(topicData.title, userPrefs, languageName);
+            // Save to cache if we got actual questions
+            if (questions && questions.length > 0) {
+                await cacheRef.set({
+                    topicId,
+                    language,
+                    quiz: questions,
+                    createdAt: new Date().toISOString()
+                });
+            }
+        }
 
         res.status(200).json({
             success: true,
+            language,
             data: { questions },
             message: 'Quiz generated successfully'
         });
@@ -61,6 +82,7 @@ router.post('/submit', verifyToken, async (req, res) => {
     try {
         const { topicId, answers, questions } = req.body;
         const { uid } = req.user;
+        const { language, languageName } = req;
 
         let score = 0;
         questions.forEach((q, index) => {
@@ -77,7 +99,8 @@ router.post('/submit', verifyToken, async (req, res) => {
         const userData = userDoc.data();
         const userPrefs = { experience: userData?.experience };
 
-        const feedback = await generateFeedback(score, questions.length, userPrefs);
+        // Generate feedback in target language
+        const feedback = await generateFeedback(score, questions.length, userPrefs, languageName);
 
         const currentHearts = userData.hearts ?? 5;
         let newHearts = currentHearts;
@@ -151,6 +174,7 @@ router.post('/submit', verifyToken, async (req, res) => {
 
         res.status(200).json({
             success: true,
+            language,
             data: {
                 score,
                 total: questions.length,

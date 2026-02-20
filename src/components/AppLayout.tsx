@@ -14,11 +14,11 @@ const AppLayoutContent = () => {
       <AppSidebar />
 
       <main
-        className="transition-all duration-300 ease-in-out relative z-10"
-        style={{ marginLeft: isCompact ? "80px" : "280px" }}
+        className={`transition-all duration-300 ease-in-out relative z-10 ${isCompact ? "lg:ml-20" : "lg:ml-[280px]"
+          } ml-0`}
       >
         <DashboardTopBar />
-        <div className="max-w-[1400px] mx-auto min-h-screen px-4 py-8 pb-20 lg:px-8">
+        <div className="max-w-[1400px] mx-auto min-h-screen px-3 md:px-4 py-6 md:py-8 pb-20 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

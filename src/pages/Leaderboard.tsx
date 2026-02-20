@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import CactusAvatar from "@/components/CactusAvatar";
+import { useTranslation } from "@/lib/i18n";
 
 const rankConfig: Record<number, { icon: React.ReactNode; color: string; glow: string }> = {
     1: {
@@ -25,6 +26,7 @@ const rankConfig: Record<number, { icon: React.ReactNode; color: string; glow: s
 };
 
 const Leaderboard = () => {
+    const { t } = useTranslation();
     const { user } = useAuth();
 
     const { data: lbData, isLoading } = useQuery({
@@ -55,8 +57,8 @@ const Leaderboard = () => {
                         <Trophy className="w-5 h-5 text-yellow-400" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-black text-foreground tracking-tight">Leaderboard</h1>
-                        <p className="text-xs text-muted-foreground">Top BioCactus learners ranked by XP</p>
+                        <h1 className="text-2xl font-black text-foreground tracking-tight">{t('common.leaderboard')}</h1>
+                        <p className="text-xs text-muted-foreground">{t('common.leaderboard_desc')}</p>
                     </div>
                 </div>
             </motion.div>
@@ -66,34 +68,37 @@ const Leaderboard = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="glass-card p-5 mb-8 flex items-center gap-6 flex-wrap"
+                className="glass-card p-4 md:p-5 mb-8 flex flex-col sm:flex-row items-center gap-4 md:gap-6"
             >
-                <CactusAvatar size="sm" showBubble={false} mood="happy" />
-                <div className="flex-1 min-w-0">
-                    <p className="text-xs uppercase tracking-widest text-muted-foreground font-bold mb-0.5">Your Stats</p>
-                    <p className="text-sm font-bold text-foreground truncate">{user?.displayName || "You"}</p>
+                <div className="flex items-center gap-4 w-full sm:w-auto">
+                    <CactusAvatar size="sm" showBubble={false} mood="happy" />
+                    <div className="flex-1 min-w-0">
+                        <p className="text-[10px] md:text-xs uppercase tracking-widest text-muted-foreground font-bold mb-0.5">{t('common.your_stats')}</p>
+                        <p className="text-sm font-bold text-foreground truncate">{user?.displayName || t('common.profile')}</p>
+                    </div>
                 </div>
-                <div className="flex items-center gap-5">
+
+                <div className="flex items-center justify-between sm:justify-end gap-3 md:gap-5 w-full sm:w-auto border-t sm:border-t-0 border-white/5 pt-3 sm:pt-0">
                     <div className="flex flex-col items-center gap-1">
                         <div className="flex items-center gap-1">
                             <Zap className="w-3.5 h-3.5 text-xp" />
                             <span className="text-sm font-black text-xp">{myXP}</span>
                         </div>
-                        <span className="text-[9px] uppercase tracking-widest text-muted-foreground">XP</span>
+                        <span className="text-[9px] uppercase tracking-widest text-muted-foreground">{t('common.experience')}</span>
                     </div>
                     <div className="flex flex-col items-center gap-1">
                         <div className="flex items-center gap-1">
                             <Flame className="w-3.5 h-3.5 text-streak" />
                             <span className="text-sm font-black text-streak">{streak}</span>
                         </div>
-                        <span className="text-[9px] uppercase tracking-widest text-muted-foreground">Streak</span>
+                        <span className="text-[9px] uppercase tracking-widest text-muted-foreground">{t('common.lb_streak')}</span>
                     </div>
                     <div className="flex flex-col items-center gap-1">
                         <div className="flex items-center gap-1">
                             <Heart className={`w-3.5 h-3.5 ${hearts > 0 ? "text-destructive fill-destructive/20" : "text-muted-foreground"}`} />
                             <span className={`text-sm font-black ${hearts > 0 ? "text-destructive" : "text-muted-foreground"}`}>{hearts}</span>
                         </div>
-                        <span className="text-[9px] uppercase tracking-widest text-muted-foreground">Hearts</span>
+                        <span className="text-[9px] uppercase tracking-widest text-muted-foreground">{t('common.lb_hearts')}</span>
                     </div>
                 </div>
             </motion.div>
@@ -109,7 +114,7 @@ const Leaderboard = () => {
                 </div>
             ) : entries.length === 0 ? (
                 <div className="glass-card p-12 text-center">
-                    <CactusAvatar size="lg" mood="thinking" message="No data yet! Be the first to earn XP 🔬" />
+                    <CactusAvatar size="lg" mood="thinking" message={t('common.no_lb_data')} />
                 </div>
             ) : (
                 <div className="space-y-3">
@@ -161,9 +166,9 @@ const Leaderboard = () => {
                                 </div>
 
                                 {/* XP */}
-                                <div className="flex items-center gap-1.5 shrink-0">
-                                    <Zap className="w-4 h-4 text-xp" />
-                                    <span className="text-sm font-black text-xp">{entry.xp.toLocaleString()} XP</span>
+                                <div className="flex items-center gap-1 md:gap-1.5 shrink-0">
+                                    <Zap className="w-3.5 h-3.5 md:w-4 md:h-4 text-xp" />
+                                    <span className="text-xs md:text-sm font-black text-xp">{entry.xp.toLocaleString()} <span className="hidden sm:inline">XP</span></span>
                                 </div>
                             </motion.div>
                         );

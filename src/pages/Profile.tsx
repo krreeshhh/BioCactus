@@ -24,9 +24,11 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
+import { useTranslation } from "@/lib/i18n";
 
 const Profile = () => {
   const { user, logout, updateUserProfile } = useAuth();
+  const { language, setLanguage, t } = useTranslation();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -55,9 +57,9 @@ const Profile = () => {
     try {
       await updateUserProfile({ displayName: newName });
       setIsEditing(false);
-      toast.success("Profile updated successfully");
+      toast.success(t('common.profile_updated'));
     } catch (error) {
-      toast.error("Failed to update profile");
+      toast.error(t('common.profile_update_failed'));
     } finally {
       setIsUpdating(false);
     }
@@ -106,10 +108,10 @@ const Profile = () => {
   return (
     <div className="p-4 lg:p-8 max-w-[1200px] mx-auto space-y-10 pb-20">
       {/* Profile Header */}
-      <div className="relative overflow-hidden m3-glass p-8 lg:p-12">
+      <div className="relative overflow-hidden m3-glass p-6 md:p-8 lg:p-12">
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 blur-[120px] -mr-48 -mt-48" />
 
-        <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
+        <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10 text-center md:text-left">
           {/* Avatar Section */}
           <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
             <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-3xl overflow-hidden border-2 border-primary/20 group-hover:border-primary transition-all duration-500 shadow-2xl">
@@ -160,7 +162,7 @@ const Profile = () => {
                     exit={{ opacity: 0, x: 10 }}
                     className="flex items-center gap-4 justify-center md:justify-start"
                   >
-                    <h1 className="text-4xl lg:text-5xl font-black tracking-tighter text-foreground">{user?.displayName || "Researcher"}</h1>
+                    <h1 className="text-4xl lg:text-5xl font-black tracking-tighter text-foreground">{user?.displayName || t('common.researcher')}</h1>
                     <button
                       onClick={() => setIsEditing(true)}
                       className="p-2 rounded-xl hover:bg-white/5 text-muted-foreground transition-colors"
@@ -176,34 +178,70 @@ const Profile = () => {
 
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
               <div className="px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest leading-none">
-                Bio-Level {level}
+                {t('common.bio_level')} {level}
               </div>
               <div className="px-4 py-1.5 rounded-full bg-xp/10 border border-xp/20 text-xp text-[10px] font-black uppercase tracking-widest leading-none">
-                {userRank > 0 ? `Ranked #${userRank}` : "Unranked"}
+                {userRank > 0 ? `${t('common.ranked')} #${userRank}` : t('common.unranked')}
               </div>
               <div className="px-4 py-1.5 rounded-full bg-streak/10 border border-streak/20 text-streak text-[10px] font-black uppercase tracking-widest leading-none">
-                Pioneer Status
+                {t('common.pioneer_status')}
               </div>
             </div>
           </div>
 
           {/* Logout Button */}
-          <button
-            onClick={handleLogout}
-            className="p-4 rounded-2xl bg-white/5 border border-white/5 text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-all active:scale-95"
-          >
-            <LogOut className="w-6 h-6" />
-          </button>
+          <div className="flex flex-col gap-3 mt-4 md:mt-0 w-full md:w-auto">
+            <button
+              onClick={handleLogout}
+              className="p-3 md:p-4 rounded-2xl bg-white/5 border border-white/5 text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-all active:scale-95 flex items-center justify-center gap-2"
+            >
+              <LogOut className="w-5 h-5 md:w-6 md:h-6" />
+              <span className="md:hidden font-bold text-sm">Sign Out</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Language Selector */}
+        <div className="mt-8 pt-6 border-t border-white/5 flex flex-wrap items-center gap-4">
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Language Interface</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { code: 'en', name: 'English', native: 'English' },
+              { code: 'ta', name: 'Tamil', native: 'தமிழ்' },
+              { code: 'hi', name: 'Hindi', native: 'हिन्दी' }
+            ].map((lang) => (
+              <button
+                key={lang.code}
+                onClick={async () => {
+                  setLanguage(lang.code);
+                  try {
+                    await api.updateLanguage(lang.code);
+                    toast.success(`${t('common.lang_set_to')} ${lang.native}`);
+                    // Optional: Refresh or redirect to apply changes everywhere
+                    window.location.reload();
+                  } catch (e) {
+                    toast.error(t('common.lang_sync_failed'));
+                  }
+                }}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${language === lang.code
+                  ? "bg-primary text-white shadow-lg shadow-primary/20"
+                  : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-foreground"
+                  }`}
+              >
+                {lang.native}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { icon: Zap, label: "Total Points", value: `${xp.toLocaleString()} XP`, color: "text-xp", bg: "bg-xp/10" },
-          { icon: Flame, label: "Day Streak", value: `${streak} Days`, color: "text-streak", bg: "bg-streak/10" },
-          { icon: BookOpen, label: "Lessons Sync", value: completedLessons, color: "text-primary", bg: "bg-primary/10" },
-          { icon: Target, label: "Sync Accuracy", value: accuracy, color: "text-accent", bg: "bg-accent/10" },
+          { icon: Zap, label: t('common.total_points'), value: `${xp.toLocaleString()} XP`, color: "text-xp", bg: "bg-xp/10" },
+          { icon: Flame, label: t('common.streak'), value: `${streak} ${t('common.days')}`, color: "text-streak", bg: "bg-streak/10" },
+          { icon: BookOpen, label: t('common.lessons'), value: completedLessons, color: "text-primary", bg: "bg-primary/10" },
+          { icon: Target, label: t('common.sync_accuracy'), value: accuracy, color: "text-accent", bg: "bg-accent/10" },
         ].map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -226,7 +264,7 @@ const Profile = () => {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between px-2">
             <h2 className="text-2xl font-black tracking-tighter flex items-center gap-3">
-              <Award className="w-6 h-6 text-primary" /> Researcher Merits
+              <Award className="w-6 h-6 text-primary" /> {t('common.merits')}
             </h2>
           </div>
 
@@ -260,10 +298,10 @@ const Profile = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between px-2">
             <h2 className="text-2xl font-black tracking-tighter flex items-center gap-3">
-              <Trophy className="w-6 h-6 text-xp" /> Standings
+              <Trophy className="w-6 h-6 text-xp" /> {t('common.standings')}
             </h2>
             <Link to="/leaderboard" className="text-xs font-bold text-primary hover:underline flex items-center gap-1 group">
-              View All <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              {t('common.view_all_link')} <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
@@ -278,7 +316,7 @@ const Profile = () => {
                   {entry.avatar?.startsWith("http") ? <img src={entry.avatar} className="w-full h-full object-cover" /> : <GiDna1 className="w-4 h-4 text-primary" />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold truncate">{entry.name} {entry.uid === user?.uid && "(You)"}</p>
+                  <p className="text-xs font-bold truncate">{entry.name} {entry.uid === user?.uid && t('common.you_label')}</p>
                 </div>
                 <p className="text-[10px] font-black text-xp">{entry.xp.toLocaleString()}</p>
               </div>
@@ -291,7 +329,7 @@ const Profile = () => {
                   {user?.photoURL ? <img src={user.photoURL} className="w-full h-full object-cover" /> : <GiDna1 className="w-4 h-4 text-primary" />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold truncate">{user?.displayName} (You)</p>
+                  <p className="text-xs font-bold truncate">{user?.displayName} {t('common.you_label')}</p>
                 </div>
                 <p className="text-[10px] font-black text-xp">{xp.toLocaleString()}</p>
               </div>
