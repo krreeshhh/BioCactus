@@ -57,4 +57,9 @@ export const api = {
             method: "POST",
             body: JSON.stringify({ message, history }),
         }),
+    submitFeedback: (data: { type: string; message: string; rating: number }) =>
+        fetchWithToken("/feedback", {
+            method: "POST",
+            body: JSON.stringify(data)
+        }),
 };

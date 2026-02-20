@@ -12,7 +12,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Heart,
-  MessageSquare
+  MessageSquare,
+  MessageCircle
 } from "lucide-react";
 import CactusAvatar from "./CactusAvatar";
 import BrandLogo from "./BrandLogo";
@@ -147,6 +148,7 @@ const AppSidebar = () => {
                 { path: "/chat", label: t('common.ai_assistant'), icon: MessageSquare },
                 { path: "/leaderboard", label: t('common.leaderboard'), icon: Trophy },
                 { path: "/profile", label: t('common.profile'), icon: User },
+                { path: "/feedback", label: "Feedback", icon: MessageCircle },
               ].map((item) => {
                 const isActive = location.pathname === item.path;
                 return (

@@ -12,6 +12,7 @@ const lessonRoutes = require('./routes/lesson.routes');
 const quizRoutes = require('./routes/quiz.routes');
 const progressRoutes = require('./routes/progress.routes');
 const chatRoutes = require('./routes/chat.routes');
+const feedbackRoutes = require('./routes/feedback.routes');
 const { languageMiddleware } = require('./middleware/language.middleware');
 const compression = require('compression');
 const path = require('path');
@@ -34,6 +35,7 @@ app.use('/api/lesson', lessonRoutes);
 app.use('/api/quiz', quizRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {

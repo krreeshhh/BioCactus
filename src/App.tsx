@@ -23,6 +23,7 @@ const CoursePath = lazy(() => import("./pages/CoursePath"));
 const Leaderboard = lazy(() => import("./pages/Leaderboard"));
 const Curriculum = lazy(() => import("./pages/Curriculum"));
 const ChatPage = lazy(() => import("./pages/ChatPage"));
+const Feedback = lazy(() => import("./pages/Feedback"));
 
 const LoadingFallback = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
@@ -62,6 +63,7 @@ const App = () => (
                     <Route path="/quiz/:topicId/:lessonIndex" element={<Quiz />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/chat" element={<ChatPage />} />
+                    <Route path="/feedback" element={<Feedback />} />
                   </Route>
                 </Route>
 
