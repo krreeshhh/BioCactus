@@ -112,11 +112,11 @@ const Onboarding = () => {
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+        <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8 md:py-12">
             <div className="w-full max-w-lg">
-                <div className="mb-8 flex justify-center">
+                <div className="mb-6 md:mb-8 flex justify-center">
                     <CactusAvatar
-                        size="lg"
+                        size={typeof window !== 'undefined' && window.innerWidth < 640 ? "md" : "lg"}
                         mood={step.cactusMood}
                         message={step.message}
                     />
@@ -131,7 +131,7 @@ const Onboarding = () => {
                         transition={{ duration: 0.3 }}
                     >
                         <Card className="border-primary/20 shadow-xl glass-card">
-                            <CardContent className="p-6 pt-8">
+                            <CardContent className="p-4 md:p-6 pt-6 md:pt-8">
                                 <h1 className="text-2xl font-bold text-center mb-6 text-primary">
                                     {step.title}
                                 </h1>
@@ -148,7 +148,7 @@ const Onboarding = () => {
                                             <button
                                                 key={opt.value}
                                                 onClick={() => handleSelect(opt.value)}
-                                                className="w-full text-left p-4 rounded-xl border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all group"
+                                                className="w-full text-left p-3 md:p-4 rounded-xl border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all group"
                                             >
                                                 <div className="font-bold text-foreground group-hover:text-primary transition-colors">
                                                     {opt.label}

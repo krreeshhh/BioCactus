@@ -39,9 +39,9 @@ const CoursePath = () => {
         const isCurrent = i === completedCount;
         const isLocked = i > completedCount;
 
-        // Zigzag logic: lesson 1 at bottom, lesson N at top
-        // Alternating left and right offsets
-        const xOffset = Math.sin(i * 1.2) * 100;
+        // Zigzag logic responsive: use smaller offset on mobile
+        const xOffsetMult = typeof window !== 'undefined' && window.innerWidth < 768 ? 40 : 100;
+        const xOffset = Math.sin(i * 1.2) * xOffsetMult;
 
         return {
             id: i + 1,

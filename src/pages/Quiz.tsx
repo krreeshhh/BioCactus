@@ -142,7 +142,7 @@ const Quiz = () => {
         <div className="absolute bottom-0 -left-20 w-80 h-80 bg-emerald-500/5 rounded-full blur-[120px]" />
       </div>
 
-      <div className="p-6 lg:p-10 w-full max-w-3xl mx-auto flex-1 flex flex-col relative z-10">
+      <div className="p-4 md:p-10 w-full mb-10 max-w-4xl mx-auto flex-1 flex flex-col relative z-10">
         <Link
           to={`/course/${topicId}`}
           className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-all mb-8 group"

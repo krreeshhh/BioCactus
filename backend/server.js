@@ -24,6 +24,9 @@ app.use(cors());
 app.use(express.json());
 app.use(languageMiddleware);
 
+// Health check
+app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);

@@ -23,15 +23,15 @@ const TopicCard = ({ topic, index }: TopicCardProps) => {
       className="h-full"
     >
       <Link to={`/course/${topic.id}`} className="block h-full">
-        <div className="m3-glass-interactive p-6 group cursor-pointer h-full relative overflow-hidden flex flex-col">
+        <div className="m3-glass-interactive p-4 md:p-6 group cursor-pointer h-full relative overflow-hidden flex flex-col">
           {/* Glass light reflection effect */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
           <div className="relative z-10 flex-1">
             {/* Icon and status */}
-            <div className="flex items-start justify-between mb-6">
-              <div className="w-14 h-14 rounded-[var(--radius)] bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-inner group-hover:bg-primary/10 group-hover:shadow-[0_0_20px_rgba(var(--primary),0.2)]">
-                <topic.icon className="w-8 h-8 text-foreground/80 group-hover:text-primary transition-colors" />
+            <div className="flex items-start justify-between mb-4 md:mb-6">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-[var(--radius)] bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 shadow-inner group-hover:bg-primary/10 group-hover:shadow-[0_0_20px_rgba(var(--primary),0.2)]">
+                <topic.icon className="w-6 h-6 md:w-8 md:h-8 text-foreground/80 group-hover:text-primary transition-colors" />
               </div>
               <div className="flex flex-col items-end gap-2">
                 {isCompleted ? (

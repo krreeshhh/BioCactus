@@ -116,7 +116,7 @@ const ChatPage = () => {
         date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
     return (
-        <div className="flex flex-col h-[calc(100vh-80px)] max-w-4xl mx-auto px-4 py-6">
+        <div className="flex flex-col h-[calc(100vh-130px)] md:h-[calc(100vh-100px)] max-w-4xl mx-auto px-2 md:px-4 py-4 md:py-6">
             {/* Header */}
             <motion.div
                 initial={{ opacity: 0, y: -10 }}
