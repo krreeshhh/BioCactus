@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -32,6 +33,18 @@ const AppSidebar = () => {
   });
 
   const { xp = 0, level = 1, streak = 0, hearts = 5 } = progressData?.data || {};
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 1024 : false
+  );
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   return (
     <>
@@ -52,7 +65,7 @@ const AppSidebar = () => {
         initial={false}
         animate={{
           width: isCompact ? 80 : 280,
-          x: isMobileOpen ? 0 : (typeof window !== 'undefined' && window.innerWidth < 1024 ? -280 : 0)
+          x: isMobileOpen ? 0 : (isMobile ? -280 : 0)
         }}
         className={`fixed left-0 top-0 bottom-0 bg-sidebar-background flex flex-col z-50 overflow-hidden border-r border-white/10 shadow-2xl transition-all duration-300 ease-in-out lg:translate-x-0 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
           }`}
